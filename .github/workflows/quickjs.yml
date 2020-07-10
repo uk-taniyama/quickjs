@@ -19,8 +19,6 @@ jobs:
       run: |
          cd native
          ./build.bat
-         mkdir src/main/resources/META-INF 2> NUL
-         copy /Y quickjs.dll src/main/resources/META-INF
     - name: Test
       run: |
          mvn --no-transfer-progress -q -B -DskipTests package
