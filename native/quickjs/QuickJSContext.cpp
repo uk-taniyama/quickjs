@@ -364,8 +364,7 @@ jobject QuickJSContext::toObject(JNIEnv *env, JSValue value) {
     jvalue ret;
     size_t buf_size;
     if (JS_IsInteger(value)) {
-        int32_t ret_val_i = (int32_t) ret.i;
-        JS_ToInt32(ctx, &ret_val_i, value);
+        JS_ToInt32(ctx, &ret.i, value);
         return box(env, intClass, intValueOf, ret);
     }
     else if (JS_IsNumber(value)) {

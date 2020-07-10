@@ -1,0 +1,25 @@
+name: quickjs
+
+on:
+  [push]
+jobs:
+  windows:
+    name: windows
+    runs-on: windows-2016
+    if: "contains(toJSON(github.event.commits.*.message), '[build windows]')"
+    steps:
+    - uses: actions/checkout@v2
+      name: Checkout project
+    - uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+        java-package: jdk
+        architecture: x64
+    - name: Build
+      run: |
+         cd native
+         ./build.bat
+         cd ..
+         cd ..
+         mvn --no-transfer-progress -q -B -DskipTests package
+         mvn --no-transfer-progress test

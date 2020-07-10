@@ -15,9 +15,29 @@
  */
 package com.koushikdutta.quack;
 
+import static java.lang.System.getProperty;
+import static java.nio.file.Files.copy;
+import static java.nio.file.Files.createDirectory;
+import static java.nio.file.Files.createFile;
+import static java.nio.file.Files.exists;
+import static java.nio.file.Paths.get;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static java.util.Locale.ENGLISH;
+
 import java.io.Closeable;
-import java.lang.reflect.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -36,6 +56,50 @@ public final class QuackContext implements Closeable {
   final Map<Method, QuackMethodCoercion> JavaScriptToJavaMethodCoercions = new LinkedHashMap<>();
   final Map<Method, QuackMethodCoercion> JavaToJavascriptMethodCoercions = new LinkedHashMap<>();
   private QuackInvocationHandlerWrapper invocationHandlerWrapper;
+
+  private static boolean loaded = false;
+
+  private static final String OS_NAME = getProperty("os.name").toLowerCase(ENGLISH);
+
+  // temporary directory location
+  private static final Path tmpdir = get(getProperty("java.io.tmpdir")).toAbsolutePath();
+
+  private static final boolean WINDOWS = OS_NAME.startsWith("windows");
+
+  private static final boolean MAC = OS_NAME.contains("mac");
+
+  private static final String version = "1.0.0";
+
+  static {
+      loadJni();
+  }
+
+  public static synchronized boolean loadJni() {
+      if (loaded) {
+          return true;
+      }
+      ClassLoader cl = QuackContext.class.getClassLoader();
+      String name = WINDOWS ? "quickjs.dll" : MAC ? "libquickjs.dylib" : "libquickjs.so";
+      Path libFile = tmpdir.resolve("quickjs-" + version).resolve(name);
+      if (!exists(libFile)) {
+          try (InputStream is = cl.getResourceAsStream("META-INF/" + name)) {
+              if (is == null) {
+                  throw new RuntimeException("resource not found: META-INF/" + name);
+              }
+              if (!exists(libFile.getParent())) {
+                  createDirectory(libFile.getParent());
+              }
+              if (!exists(libFile)) {
+                  createFile(libFile);
+              }
+              copy(is, libFile, REPLACE_EXISTING);
+          } catch (IOException e) {
+              throw new RuntimeException(e);
+          }
+      }
+      System.load(libFile.toString());
+      return loaded = true;
+  }
 
   static boolean isEmpty(String str) {
     return str == null || str.length() == 0;

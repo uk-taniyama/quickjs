@@ -17,7 +17,6 @@ include_directories(${JAVA_INCLUDE_PATH})
 include_directories(${JAVA_INCLUDE_PATH2})
 
 set(CMAKE_CXX_FLAGS "-fpermissive")
-
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static")
 
 file(GLOB quickjs_SRC
@@ -36,5 +35,10 @@ add_definitions(-DCONFIG_VERSION="2020-07-05")
 add_library(quickjs SHARED
                   ${quickjs_SRC})
 if(WIN32)
+  set_target_properties(quickjs PROPERTIES PREFIX "")
   target_link_libraries(quickjs -static-libstdc++ -static-libgcc pthread)
 endif()
+
+set_target_properties(quickjs
+          PROPERTIES
+          RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../src/main/resources/META-INF")

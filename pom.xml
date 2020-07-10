@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.webfolder</groupId>
   <artifactId>quickjs</artifactId>
-  <version>1.2.1</version>
+  <version>1.0.0</version>
   <name>quickjs</name>
   <description>The quickjs embeddable Javascript engine packaged for Java.</description>
   <licenses>
