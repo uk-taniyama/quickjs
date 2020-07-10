@@ -81,6 +81,7 @@ jobs:
       run: |
          mvn --no-transfer-progress -q -B -DskipTests package
          mvn --no-transfer-progress test
+         ls -l src/main/resources/META-INF
     - name: Archive library
       uses: actions/upload-artifact@v1
       with:
