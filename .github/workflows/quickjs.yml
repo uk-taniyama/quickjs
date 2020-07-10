@@ -23,6 +23,11 @@ jobs:
       run: |
          mvn --no-transfer-progress -q -B -DskipTests package
          mvn --no-transfer-progress test
+    - name: Archive library
+      uses: actions/upload-artifact@v1
+      with:
+        name: quickjs-windows
+        path: src\main\resources\META-INF\quickjs.dll
   mac:
     name: macos
     runs-on: macos-10.15
@@ -47,6 +52,11 @@ jobs:
       run: |
          mvn --no-transfer-progress -q -B -DskipTests package
          mvn --no-transfer-progress test
+    - name: Archive library
+      uses: actions/upload-artifact@v1
+      with:
+        name: quickjs-macos
+        path: src/main/resources/META-INF/libquickjs.dylib
   linux:
     name: linux
     runs-on: ubuntu-18.04
@@ -71,3 +81,9 @@ jobs:
       run: |
          mvn --no-transfer-progress -q -B -DskipTests package
          mvn --no-transfer-progress test
+
+    - name: Archive library
+      uses: actions/upload-artifact@v1
+      with:
+        name: quickjs-linux
+        path: src/main/resources/META-INF/libquickjs.so
