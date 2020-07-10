@@ -16,11 +16,10 @@ message(STATUS "JAVA_INCLUDE_PATH2=${JAVA_INCLUDE_PATH2}")
 include_directories(${JAVA_INCLUDE_PATH})
 include_directories(${JAVA_INCLUDE_PATH2})
 
+set(CMAKE_CXX_FLAGS "-fpermissive -Wno-array-bounds -Wno-format-truncation")
+
 if(UNIX)
-  set(CMAKE_CXX_FLAGS "-fpermissive -Wno-array-bounds -Wno-format-truncation")
-  add_definitions(-D_GNU_SOURCE="")
-else()
-  set(CMAKE_CXX_FLAGS "-fpermissive")
+  add_definitions(-D_GNU_SOURCE)
 endif()
 
 if(WIN32)
