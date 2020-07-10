@@ -16,7 +16,12 @@ message(STATUS "JAVA_INCLUDE_PATH2=${JAVA_INCLUDE_PATH2}")
 include_directories(${JAVA_INCLUDE_PATH})
 include_directories(${JAVA_INCLUDE_PATH2})
 
-set(CMAKE_CXX_FLAGS "-fpermissive")
+if(UNIX)
+  set(CMAKE_CXX_FLAGS "-fpermissive -Wno-array-bounds -Wno-format-truncation")
+  add_definitions(-D_GNU_SOURCE="")
+else()
+  set(CMAKE_CXX_FLAGS "-fpermissive")
+endif()
 
 if(WIN32)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static")
