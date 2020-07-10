@@ -47,36 +47,26 @@ jobs:
       run: |
          mvn --no-transfer-progress -q -B -DskipTests package
          mvn --no-transfer-progress test
-  centos:
-    name: centos
-    runs-on: ubuntu-latest
-    if: "contains(toJSON(github.event.commits.*.message), '[build centos]')"
-    container: centos:7
+  linux:
+    name: linux
+    runs-on: ubuntu-16.04
+    if: "contains(toJSON(github.event.commits.*.message), '[build linux]')"
     steps:
     - uses: actions/checkout@v2
       name: Checkout project
+    - uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+        java-package: jdk
+        architecture: x64
     - name: Build
       run: |
-        yum -y update
-        yum -y group install "Development Tools"
-        yum -y install wget
-        yum -y install unzip
-        yum -y install maven
-        mkdir -p archive
-        cd archive
-        if [ ! -d "cmake" ]; then
-          wget -q https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3-Linux-x86_64.tar.gz
-          tar xfz cmake-3.17.3-Linux-x86_64.tar.gz
-          mv cmake-3.17.3-Linux-x86_64/ cmake/
-        fi
-        export PATH=$PATH:$PWD/cmake/bin
-        cd ..
-        cd native
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release
-        make
-        otool -L libquickjs.dylib
+         cd native
+         mkdir build
+         cd build
+         cmake .. -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release
+         make
+         ldd libquickjs.so
     - name: Test
       run: |
          mvn --no-transfer-progress -q -B -DskipTests package
