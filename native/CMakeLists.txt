@@ -49,10 +49,10 @@ endif()
 if(WIN32)
   set_target_properties(quickjs PROPERTIES PREFIX "")
   target_link_libraries(quickjs -static-libstdc++ -static-libgcc pthread)
-endif()
-
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   target_link_libraries(quickjs -static-libstdc++ -static-libgcc)
+else()
+  target_link_libraries(quickjs)
 endif()
 
 set_target_properties(quickjs
