@@ -79,7 +79,7 @@ jobs:
          cd build
          cmake .. -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_BUILD_TYPE=Release
          make
-         ldd libquickjs.s
+         ldd libquickjs.so
          cp libquickjs.so ../../src/main/resources/META-INF
     - name: Test
       run: |
