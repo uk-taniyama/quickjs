@@ -57,10 +57,6 @@ typedef sig_t sighandler_t;
 
 #endif
 
-#ifdef __linux__ 
-extern char** environ;
-#endif
-
 #if !defined(_WIN32)
 /* enable the os.Worker API. IT relies on POSIX threads */
 #define USE_WORKER
