@@ -73,6 +73,7 @@ jobs:
         architecture: x64
     - name: Build
       run: |
+         apt install -y ninja
          cd native
          mkdir build
          cd build
