@@ -61,7 +61,6 @@ jobs:
         architecture: x64
     - name: Build
       run: |
-         ls -l /usr/bin | grep gcc
          cd native
          mkdir build
          cd build
