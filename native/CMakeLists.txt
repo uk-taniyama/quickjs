@@ -17,7 +17,14 @@ include_directories(${JAVA_INCLUDE_PATH})
 include_directories(${JAVA_INCLUDE_PATH2})
 
 set(CMAKE_CXX_FLAGS "-fpermissive")
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static")
+
+if(WIN32)
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static")
+endif()
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static")
+endif()
 
 file(GLOB quickjs_SRC
   "quickjs/*.h"
@@ -34,9 +41,18 @@ add_definitions(-DCONFIG_VERSION="2020-07-05")
 
 add_library(quickjs SHARED
                   ${quickjs_SRC})
+
+if (CMAKE_BUILD_TYPE MATCHES Release)
+  set_target_properties(quickjs PROPERTIES LINK_FLAGS_RELEASE -s)
+endif()
+
 if(WIN32)
   set_target_properties(quickjs PROPERTIES PREFIX "")
   target_link_libraries(quickjs -static-libstdc++ -static-libgcc pthread)
+endif()
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+  target_link_libraries(quickjs -static-libstdc++ -static-libgcc)
 endif()
 
 set_target_properties(quickjs
