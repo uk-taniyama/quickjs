@@ -73,15 +73,14 @@ jobs:
         architecture: x64
     - name: Build
       run: |
-         wget https://github.com/ninja-build/ninja/releases/download/v1.10.0/ninja-win.zip
-         unzip ninja-win.zip
-         export PATH=$PWD:$PATH
+         mkdir -p src/main/resources/META-INF
          cd native
          mkdir build
          cd build
-         cmake .. -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_BUILD_TYPE=Release -GNinja
-         ninja
-         ldd libquickjs.so
+         cmake .. -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_BUILD_TYPE=Release
+         make
+         ldd libquickjs.s
+         cp libquickjs.so ../../src/main/resources/META-INF
     - name: Test
       run: |
          mvn test
