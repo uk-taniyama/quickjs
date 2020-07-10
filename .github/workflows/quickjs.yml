@@ -19,7 +19,7 @@ jobs:
       run: |
          cd native
          ./build.bat
-         cd ..
-         cd ..
+    - name: Test
+      run: |
          mvn --no-transfer-progress -q -B -DskipTests package
          mvn --no-transfer-progress test
