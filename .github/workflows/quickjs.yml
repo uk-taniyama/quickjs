@@ -73,7 +73,9 @@ jobs:
         architecture: x64
     - name: Build
       run: |
-         sudo apt-get install -y ninja
+         wget https://github.com/ninja-build/ninja/releases/download/v1.10.0/ninja-win.zip
+         unzip ninja-win.zip
+         export PATH=$CWD:$PATH
          cd native
          mkdir build
          cd build
