@@ -19,7 +19,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class QuackTests {
+public class TestQuack {
     private static boolean useQuickJS = true;
 
     // takes a long time. Duktape does not pass due to a const limit. quickjs works.
@@ -516,7 +516,7 @@ public class QuackTests {
         }
         catch (Exception e) {
             Assert.assertTrue(e.getMessage().contains("java!"));
-            findStack(e, "callback.*?QuackTests");
+            findStack(e, "callback.*?TestQuack");
             findStack(e, "func1");
             findStack(e, "func2");
             findStack(e, "func3");
@@ -601,7 +601,7 @@ public class QuackTests {
         String splits[] = ret.split("\n");
 
         Assert.assertTrue(ret.contains("java!"));
-        findStack(splits, "callback.*?QuackTests");
+        findStack(splits, "callback.*?TestQuack");
         findStack(splits, "func1");
         findStack(splits, "func2");
         findStack(splits, "func3");
@@ -769,7 +769,7 @@ public class QuackTests {
     @Test
     public void testClassCreation() throws ClassNotFoundException {
         String script =
-                "var Foo2 = JavaClass.forName('com.koushikdutta.quack.QuackTests$Foo2');\n" +
+                "var Foo2 = JavaClass.forName('com.koushikdutta.quack.TestQuack$Foo2');\n" +
                         "var foo = new Foo2();\n" +
                         "foo.hello('hello world');\n";
 

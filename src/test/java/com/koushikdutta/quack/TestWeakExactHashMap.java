@@ -6,7 +6,7 @@ import java.lang.ref.WeakReference;
 
 import static org.junit.Assert.assertEquals;
 
-public class WeakExactHashMapTests {
+public class TestWeakExactHashMap {
     @Test
     public void testMap() {
         Object key = new Object();
