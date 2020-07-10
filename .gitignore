@@ -26,3 +26,7 @@ hs_err_pid*
 /.settings
 /native/build
 /target/
+/native/MinGW
+/native/archive
+/native/cmake
+/native/ninja

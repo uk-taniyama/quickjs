@@ -35,5 +35,6 @@ add_definitions(-DCONFIG_VERSION="2020-07-05")
 
 add_library(quickjs SHARED
                   ${quickjs_SRC})
-
-target_link_libraries(quickjs -static-libstdc++ -static-libgcc pthread)
+if(WIN32)
+  target_link_libraries(quickjs -static-libstdc++ -static-libgcc pthread)
+endif()
