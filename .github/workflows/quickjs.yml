@@ -19,6 +19,8 @@ jobs:
       run: |
          cd native
          ./build.bat
+         mkdir src/main/resources/META-INF 2> NUL
+         copy /Y quickjs.dll src/main/resources/META-INF
     - name: Test
       run: |
          mvn --no-transfer-progress -q -B -DskipTests package
@@ -48,6 +50,8 @@ jobs:
          cmake .. -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_BUILD_TYPE=Release
          make
          otool -L libquickjs.dylib
+         mkdir -p src/main/resources/META-INF
+         cp libquickjs.dylib src/main/resources/META-INF
     - name: Test
       run: |
          mvn --no-transfer-progress -q -B -DskipTests package
@@ -77,6 +81,8 @@ jobs:
          cmake .. -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_BUILD_TYPE=Release
          make
          ldd libquickjs.so
+         mkdir -p src/main/resources/META-INF
+         cp libquickjs.so src/main/resources/META-INF
     - name: Test
       run: |
          mvn test
