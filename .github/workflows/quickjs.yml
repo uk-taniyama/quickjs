@@ -76,11 +76,9 @@ jobs:
          cd native
          mkdir build
          cd build
-         cmake .. -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_BUILD_TYPE=Release
-         make
+         cmake .. -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_BUILD_TYPE=Release -GNinja
+         ninja
          ldd libquickjs.so
-         mkdir -p src/main/resources/META-INF
-         cp libquickjs.so src/main/resources/META-INF
     - name: Test
       run: |
          mvn test
