@@ -42,7 +42,7 @@ jobs:
          cd build
          cmake .. -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_BUILD_TYPE=Release
          make
-         ldd libquickjs.dylib
+         otool -L libquickjs.dylib
     - name: Test
       run: |
          mvn --no-transfer-progress -q -B -DskipTests package
