@@ -56,7 +56,7 @@ if(WIN32)
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
   target_link_libraries(quickjs -static-libstdc++ -static-libgcc)
 else()
-  target_link_libraries(quickjs)
+  target_link_libraries(quickjs m dl pthread)
 endif()
 
 set_target_properties(quickjs
