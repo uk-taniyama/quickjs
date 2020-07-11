@@ -26,10 +26,6 @@ if(WIN32)
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static")
 endif()
 
-#if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-#  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static")
-#endif()
-
 file(GLOB quickjs_SRC
   "quickjs/*.h"
   "quickjs/*.cpp"
@@ -53,9 +49,6 @@ endif()
 if(WIN32)
   set_target_properties(quickjs PROPERTIES PREFIX "")
   target_link_libraries(quickjs -static-libstdc++ -static-libgcc pthread)
-elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-#  target_link_libraries(quickjs -static-libstdc++ -static-libgcc)
-   target_link_libraries(quickjs m dl pthread)
 else()
   target_link_libraries(quickjs m dl pthread)
 endif()
