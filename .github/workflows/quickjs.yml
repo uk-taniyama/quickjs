@@ -42,14 +42,14 @@ jobs:
         architecture: x64
     - name: Build
       run: |
+         mkdir -p src/main/resources/META-INF
          cd native
          mkdir build
          cd build
-         cmake .. -DCMAKE_C_COMPILER=gcc-9 -DCMAKE_CXX_COMPILER=g++-9 -DCMAKE_BUILD_TYPE=Release
+         cmake .. -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release
          make
          otool -L libquickjs.dylib
-         mkdir -p src/main/resources/META-INF
-         cp libquickjs.dylib src/main/resources/META-INF
+         cp libquickjs.dylib ../../src/main/resources/META-INF
     - name: Test
       run: |
          mvn --no-transfer-progress -q -B -DskipTests package
@@ -83,7 +83,8 @@ jobs:
          cp libquickjs.so ../../src/main/resources/META-INF
     - name: Test
       run: |
-         mvn test
+         mvn --no-transfer-progress -q -B -DskipTests package
+         mvn --no-transfer-progress test
     - name: Archive library
       uses: actions/upload-artifact@v1
       with:
