@@ -1,6 +1,6 @@
-# quickjs
+# QuickJS
 
-[![quickjs](https://github.com/webfolderio/quickjs/workflows/quickjs/badge.svg)](https://github.com/webfolderio/quickjs/actions) [![License](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/webfolderio/duktape4j/blob/master/LICENSE)
+[![quickjs](https://github.com/webfolderio/quickjs/workflows/quickjs/badge.svg)](https://github.com/webfolderio/quickjs/actions) [![License](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/webfolderio/quickjs/blob/master/LICENSE)
 
 Java binding for [quickjs 2020-07-05](https://bellard.org/quickjs/), a very compact embedded ECMAScript (JavaScript) engine.
 
@@ -30,7 +30,7 @@ quickjs is regularly tested on [github actions](https://github.com/webfolderio/q
 Integration with Maven
 ----------------------
 
-To use the official release of duktape4j, please use the following snippet in your `pom.xml` file.
+To use the official release of quickjs, please use the following snippet in your `pom.xml` file.
 
 Add the following to your POM's `<dependencies>` tag:
 
