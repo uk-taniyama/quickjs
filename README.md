@@ -23,6 +23,10 @@ Supported Platforms
 * Ubuntu (64-bit) (gcc)
 * macOS Catalina (10.15) (clang)
 
+Download
+--------
+[quickjs-1.0.0.jar](https://repo1.maven.org/maven2/io/webfolder/quickjs/1.0.0/quickjs-1.0.0.jar) - 1589 KB
+
 How it is tested
 ----------------
 quickjs is regularly tested on [github actions](https://github.com/webfolderio/quickjs/actions).
