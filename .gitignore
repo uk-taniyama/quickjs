@@ -31,3 +31,5 @@ hs_err_pid*
 /native/cmake
 /native/ninja
 /src/main/resources/META-INF/quickjs.dll
+/src/main/resources/META-INF/libquickjs.dylib
+/src/main/resources/META-INF/libquickjs.so
