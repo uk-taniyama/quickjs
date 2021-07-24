@@ -1131,4 +1131,20 @@ public class TestQuack {
         Object ret = quack.coerceJavaScriptToJava(long.class, jo.call(value));
         assertEquals(value, ret);
     }
+
+    @Test
+    public void testTurkishCharacters() {
+        QuackContext quack = QuackContext.create(useQuickJS);
+        String str1 = quack.evaluate("\"öÖçÇşŞiİğĞüÜıI\".toUpperCase()", String.class);
+        assertEquals("ÖÖÇÇŞŞIİĞĞÜÜII", str1);
+
+        String str2 = quack.evaluate("\"öÖçÇşŞiİğĞüÜıI\".toLocaleUpperCase('tr')", String.class);
+        assertEquals("ÖÖÇÇŞŞİİĞĞÜÜII", str2);
+
+        String str3 = quack.evaluate("\"öÖçÇşŞiİğĞüÜıI\".toLocaleLowerCase()", String.class);
+        assertEquals("ööççşşii̇ğğüüıi", str3);
+
+        String str4 = quack.evaluate("\"öÖçÇşŞiİğĞüÜıI\".toLocaleLowerCase('tr-TR')", String.class);
+        assertEquals("ööççşşiiğğüüıı", str4);
+    }
 }

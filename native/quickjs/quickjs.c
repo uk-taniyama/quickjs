@@ -41376,6 +41376,63 @@ static JSValue js_string_localeCompare(JSContext *ctx, JSValueConst this_val,
     return JS_NewInt32(ctx, cmp);
 }
 
+static JSValue js_string_toLocaleLowerCase(JSContext *ctx, JSValueConst this_val,
+                                     int argc, JSValueConst *argv, int to_lower)
+{
+    int is_tr = 0;
+    if (argc == 1) {
+      JSValue v = JS_ToString(ctx, argv[0]);
+      const char *locale_str = JS_ToCString(ctx, v);
+      if (strcmp(locale_str, "tr") == 0) {
+        is_tr = 1;
+      } else if (strcmp(locale_str, "TR") == 0) {
+        is_tr = 1;
+      } else if (strcmp(locale_str, "tr-TR") == 0) {
+        is_tr = 1;      
+      }
+      JS_FreeCString(ctx, locale_str);
+      JS_FreeValue(ctx, v);
+    }
+
+    JSValue val;
+    StringBuffer b_s, *b = &b_s;
+    JSString *p;
+    int i, c, j, l;
+    uint32_t res[LRE_CC_RES_LEN_MAX];
+
+    val = JS_ToStringCheckObject(ctx, this_val);
+    if (JS_IsException(val))
+        return val;
+    p = JS_VALUE_GET_STRING(val);
+    if (p->len == 0)
+        return val;
+    if (string_buffer_init(ctx, b, p->len))
+        goto fail;
+    for(i = 0; i < p->len;) {
+        c = string_getc(p, &i);
+        if (c == 0x3a3 && to_lower && test_final_sigma(p, i - 1)) {
+            res[0] = 0x3c2; /* final sigma */
+            l = 1;
+        } else {
+            if (!is_tr) {
+              l = lre_case_conv(res, c, to_lower);
+            } else {
+              l = lre_case_conv_turkish(res, c, to_lower);
+            }
+        }
+        for(j = 0; j < l; j++) {
+            if (string_buffer_putc(b, res[j]))
+                goto fail;
+        }
+    }
+    JS_FreeValue(ctx, val);
+    return string_buffer_end(b);
+ fail:
+    JS_FreeValue(ctx, val);
+    string_buffer_free(b);
+    return JS_EXCEPTION;
+}
+
 static JSValue js_string_toLowerCase(JSContext *ctx, JSValueConst this_val,
                                      int argc, JSValueConst *argv, int to_lower)
 {
@@ -41722,8 +41779,8 @@ static const JSCFunctionListEntry js_string_proto_funcs[] = {
     JS_CFUNC_DEF("localeCompare", 1, js_string_localeCompare ),
     JS_CFUNC_MAGIC_DEF("toLowerCase", 0, js_string_toLowerCase, 1 ),
     JS_CFUNC_MAGIC_DEF("toUpperCase", 0, js_string_toLowerCase, 0 ),
-    JS_CFUNC_MAGIC_DEF("toLocaleLowerCase", 0, js_string_toLowerCase, 1 ),
-    JS_CFUNC_MAGIC_DEF("toLocaleUpperCase", 0, js_string_toLowerCase, 0 ),
+    JS_CFUNC_MAGIC_DEF("toLocaleLowerCase", 0, js_string_toLocaleLowerCase, 1 ),
+    JS_CFUNC_MAGIC_DEF("toLocaleUpperCase", 0, js_string_toLocaleLowerCase, 0 ),
     JS_CFUNC_MAGIC_DEF("[Symbol.iterator]", 0, js_create_array_iterator, JS_ITERATOR_KIND_VALUE | 4 ),
     /* ES6 Annex B 2.3.2 etc. */
     JS_CFUNC_MAGIC_DEF("anchor", 1, js_string_CreateHTML, magic_string_anchor ),
