@@ -2,7 +2,7 @@
 
 [![quickjs](https://github.com/webfolderio/quickjs/workflows/quickjs/badge.svg)](https://github.com/webfolderio/quickjs/actions) [![License](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/webfolderio/quickjs/blob/master/LICENSE)
 
-Java binding for [quickjs 2020-07-05](https://bellard.org/quickjs/), a very compact embedded ECMAScript (JavaScript) engine.
+Java binding for [quickjs 2021-03-27](https://bellard.org/quickjs/), a very compact embedded ECMAScript (JavaScript) engine.
 
 **Important Note:** This project copied from: [quack](https://github.com/koush/). Original project supports only Android but this version supports regular JVM.
 
@@ -19,7 +19,7 @@ This library is suitable for use in production systems.
 
 Supported Platforms
 -------------------
-* Windows 8 & Windows 10 (64-bit) (MSVC 2017)
+* Windows 8 & Windows 10 (64-bit) (MinGW)
 * Ubuntu (64-bit) (gcc)
 * macOS Catalina (10.15) (clang)
 
