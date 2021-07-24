@@ -35,12 +35,30 @@ file(GLOB quickjs_SRC
   "quickjs/libunicode.c"
   "quickjs/libregexp.c"
   "quickjs/cutils.c"
+  "quickjs/quickjs-debugger.c"
 )
 
-add_definitions(-DCONFIG_VERSION="2020-07-05")
+file(GLOB quickjs_WIN_SRC
+  "quickjs/quickjs-debugger-transport-win.c"
+)
 
-add_library(quickjs SHARED
-                  ${quickjs_SRC})
+file(GLOB quickjs_NIX_SRC
+  "quickjs/quickjs-debugger-transport-unix.c"
+)
+
+add_definitions(-DCONFIG_VERSION="2021-03-27")
+if(WIN32)
+  add_definitions(-DWIN32_LEAN_AND_MEAN)
+  add_definitions(-D_WIN32_WINNT=0x0600)
+endif()
+
+if(WIN32)
+  add_library(quickjs SHARED
+                    ${quickjs_SRC} ${quickjs_WIN_SRC})
+else()
+  add_library(quickjs SHARED
+                    ${quickjs_SRC} ${quickjs_NIX_SRC})
+endif()
 
 if (CMAKE_BUILD_TYPE MATCHES Release)
   set_target_properties(quickjs PROPERTIES LINK_FLAGS_RELEASE -s)
@@ -48,7 +66,7 @@ endif()
 
 if(WIN32)
   set_target_properties(quickjs PROPERTIES PREFIX "")
-  target_link_libraries(quickjs -static-libstdc++ -static-libgcc pthread)
+  target_link_libraries(quickjs -static-libstdc++ -static-libgcc pthread ws2_32)
 else()
   target_link_libraries(quickjs m dl pthread)
 endif()

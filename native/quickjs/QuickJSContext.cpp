@@ -4,6 +4,7 @@
 #include <string.h>
 extern "C" {
 #include "quickjs-libc.h"
+#include "quickjs-debugger.h"
 }
 
 #define JS_IsUndefinedOrNull(value) (JS_IsUndefined(value) || JS_IsNull(value))
@@ -60,22 +61,23 @@ void QuickJSContext::finalizeJavaScriptObjects(JNIEnv *env, jlongArray objects) 
         // delete the entry in the stash that was keeping this alive from the java side.
         stash.erase(ptr[i]);
     }
+    JS_RunGC(runtime);
 }
 
 void QuickJSContext::setFinalizerOnFinalizerObject(JSValue finalizerObject, CustomFinalizer finalizer, void *udata) {
     auto *data = new CustomFinalizerData();
     *data = {
-        this,
-        finalizer,
-        udata
+            this,
+            finalizer,
+            udata
     };
     assert(JS_IsObject(finalizerObject));
     JS_SetOpaque(finalizerObject, data);
 }
 
 static struct JSClassDef customFinalizerClassDef = {
-    .class_name = "CustomFinalizer",
-    .finalizer = customFinalizer,
+        .class_name = "CustomFinalizer",
+        .finalizer = customFinalizer,
 };
 
 static int quickjs_has(JSContext *ctx, JSValueConst obj, JSAtom atom) {
@@ -108,20 +110,20 @@ JSValue quickjs_apply(JSContext *ctx, JSValueConst func_obj, JSValueConst this_v
 }
 
 struct JSClassExoticMethods quackObjectProxyMethods = {
-    .has_property = quickjs_has,
-    .get_property = quickjs_get,
-    .set_property = quickjs_set,
+        .has_property = quickjs_has,
+        .get_property = quickjs_get,
+        .set_property = quickjs_set,
 };
 
 static struct JSClassDef quackObjectProxyClassDef = {
-    .class_name = "QuackObjectProxy",
-    .finalizer = quackObjectFinalizer,
-    .call = quickjs_apply,
-    .exotic = &quackObjectProxyMethods,
+        .class_name = "QuackObjectProxy",
+        .finalizer = quackObjectFinalizer,
+        .call = quickjs_apply,
+        .exotic = &quackObjectProxyMethods,
 };
 
 QuickJSContext::QuickJSContext(JavaVM* javaVM, jobject javaQuack):
-    javaVM(javaVM) {
+        javaVM(javaVM) {
     runtime = JS_NewRuntime();
     ctx = JS_NewContext(runtime);
 
@@ -129,11 +131,11 @@ QuickJSContext::QuickJSContext(JavaVM* javaVM, jobject javaQuack):
     JS_SetModuleLoaderFunc(runtime, NULL, js_module_loader, NULL);
     js_std_add_helpers(ctx, 0, nullptr);
     js_init_module_std(ctx, "std");
-    //js_init_module_os(ctx, "os");
+    js_init_module_os(ctx, "os");
     const char *str = "import * as std from 'std';\n"
-        "import * as os from 'os';\n"
-        "globalThis.std = std;\n"
-        "globalThis.os = os;\n";
+                      "import * as os from 'os';\n"
+                      "globalThis.std = std;\n"
+                      "globalThis.os = os;\n";
     JS_Eval(ctx, str, strlen(str), "<input>", JS_EVAL_TYPE_MODULE);
     // end test
 
@@ -234,6 +236,7 @@ QuickJSContext::~QuickJSContext() {
     JS_FreeValue(ctx, arrayBufferPrototype);
     stash.clear();
     JS_FreeValue(ctx, thrower_function);
+    js_debugger_free(runtime, js_debugger_info(runtime));
     JS_FreeContext(ctx);
     JS_FreeRuntime(runtime);
 }
@@ -260,7 +263,6 @@ std::string QuickJSContext::toStdString(JSValue value) {
     return ret;
 }
 
-
 static std::string toStdString(JNIEnv *env, jstring value) {
     const char *str = env->GetStringUTFChars(value, 0);
     std::string ret = str;
@@ -275,6 +277,17 @@ jstring QuickJSContext::stringify(JNIEnv *env, jlong object) {
     return toString(env, JS_JSONStringify(ctx, toValueAsLocal(object), JS_UNDEFINED, JS_UNDEFINED));
 }
 
+struct ByteBufferOpaque {
+    QuickJSContext *context;
+    jobject buffer;
+};
+
+void ByteBufferFree(JSRuntime *rt, void *opaque, void *ptr) {
+    struct ByteBufferOpaque *bbo = reinterpret_cast<ByteBufferOpaque *>(opaque);
+    auto env = getEnvFromJavaVM(bbo->context->javaVM);
+    env->DeleteGlobalRef(bbo->buffer);
+    delete bbo;
+}
 
 JSValue QuickJSContext::toObject(JNIEnv *env, jobject value) {
     if (value == nullptr)
@@ -299,24 +312,24 @@ JSValue QuickJSContext::toObject(JNIEnv *env, jobject value) {
     if (env->IsAssignableFrom(clazz, byteBufferClass)) {
         jlong capacity = env->GetDirectBufferCapacity(value);
         if (capacity >= 0) {
-            // ArrayBuffer and Uint8Arrays originating from QuickJS are mapped to DirectByteBuffers in Java
-            // Java allocated DirectByteBuffers are deep copied because position and limit are mutable properties
-            // that can't be mapped to immutable JavaScript buffer types.
+            // ArrayBuffer and Uint8Arrays mapped to DirectByteBuffers in Java
             auto nativeValue = env->CallObjectMethod(javaQuack, quackUnmapNativeMethod, value);
             tempHolder = LocalRefHolder(env, nativeValue);
             if (nativeValue == nullptr) {
                 int position = env->CallIntMethod(value, bufferGetPosition);
                 int limit = env->CallIntMethod(value, bufferGetLimit);
-//                jvalue newPosition;
-//                newPosition.i = limit;
-//                env->CallObjectMethod(value, bufferSetPosition, newPosition);
-                auto buffer = hold(JS_NewArrayBufferCopy(ctx,
-                    reinterpret_cast<uint8_t *>(env->GetDirectBufferAddress(value))  + position,
-                    (size_t)(limit - position)));
+                auto opaque = new ByteBufferOpaque();
+                opaque->context = this;
+                opaque->buffer = env->NewGlobalRef(value);
+                auto buffer = hold(JS_NewArrayBuffer(ctx,
+                                                     reinterpret_cast<uint8_t *>(env->GetDirectBufferAddress(value))  + position,
+                                                     (size_t)(limit - position), ByteBufferFree, opaque, 0));
                 JSValue args[] = { (JSValue)buffer };
                 return JS_CallConstructor(ctx, uint8ArrayConstructor, 1, args);
             }
 
+            // if successfully unmapped, the object will be a JavaScriptObject
+            // which will be unpacked into a JSValue.
             value = tempHolder;
             clazz = env->GetObjectClass(value);
         }
@@ -364,7 +377,7 @@ jobject QuickJSContext::toObject(JNIEnv *env, JSValue value) {
     jvalue ret;
     size_t buf_size;
     if (JS_IsInteger(value)) {
-        JS_ToInt32(ctx, &ret.i, value);
+        JS_ToInt32(ctx, (int32_t*) &ret.i, value);
         return box(env, intClass, intValueOf, ret);
     }
     else if (JS_IsNumber(value)) {
@@ -449,7 +462,7 @@ jobject QuickJSContext::toObject(JNIEnv *env, JSValue value) {
     // with the twin
     jlong ptr = reinterpret_cast<jlong>(JS_VALUE_GET_PTR(twin));
     jobject javaThis = env->NewObject(javaScriptObjectClass, javaScriptObjectConstructor, javaQuack,
-                reinterpret_cast<jlong>(this), ptr);
+                                      reinterpret_cast<jlong>(this), ptr);
 
 
     // whether the JavaScriptObject instance should be interned.
@@ -458,8 +471,7 @@ jobject QuickJSContext::toObject(JNIEnv *env, JSValue value) {
     // todo: reenable this optionally? perform this on jvm side?
     bool trackJavaScriptObjectInstance = false;
 
-    // this does not seem to be dup'd, so don't hold it.
-    auto prototype = JS_GetPrototype(ctx, value);
+    auto prototype = hold(JS_GetPrototype(ctx, value));
 
     // if the JSValue is an ArrayBuffer or Uint8Array, create a
     // corresponding DirectByteBuffer, rather than marshalling the JavaScriptObject.
@@ -823,9 +835,9 @@ bool QuickJSContext::rethrowJavaExceptionToQuickJS(JNIEnv *env) {
 
     // merge the stacks
     auto newStack = LocalRefHolder(env,
-        env->CallStaticObjectMethod(quackExceptionClass,
-            addJavaStack,
-            env->NewStringUTF((message + "\n" + toStdString(stack)).c_str()), e));
+                                   env->CallStaticObjectMethod(quackExceptionClass,
+                                                               addJavaStack,
+                                                               env->NewStringUTF((message + "\n" + toStdString(stack)).c_str()), e));
     auto newStackValue = toObject(env, newStack);
     auto newMessage = toString(env, (jstring)(jobject)jmessage);
 
@@ -862,13 +874,13 @@ jlong QuickJSContext::getHeapSize(JNIEnv* env) {
 }
 
 void QuickJSContext::waitForDebugger(JNIEnv *env, jstring connectionString) {
-    //js_debugger_wait_connection(ctx, ::toStdString(env, connectionString).c_str());
+    js_debugger_wait_connection(ctx, ::toStdString(env, connectionString).c_str());
 }
 
 jboolean QuickJSContext::isDebugging() {
-    return false;//(jboolean)(js_debugger_is_transport_connected(ctx) ? JNI_TRUE : JNI_FALSE);
+    return (jboolean)(js_debugger_is_transport_connected(runtime) ? JNI_TRUE : JNI_FALSE);
 }
 
 void QuickJSContext::cooperateDebugger() {
-    // js_debugger_cooperate(ctx);
+    js_debugger_cooperate(ctx);
 }

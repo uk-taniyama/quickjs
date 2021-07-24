@@ -68,7 +68,7 @@ public final class QuackContext implements Closeable {
 
   private static final boolean MAC = OS_NAME.contains("mac");
 
-  private static final String version = "1.0.0";
+  private static final String version = "1.1.0";
 
   static {
       loadJni();

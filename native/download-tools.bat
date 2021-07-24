@@ -14,11 +14,11 @@ if not exist "MinGW" (
 @rem download cmake 3.17.3
 
 if not exist "cmake" (
-  if not exist "archive\cmake-3.17.3-win64-x64.zip" (
-    curl -L "https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3-win64-x64.zip" --output archive\cmake-3.17.3-win64-x64.zip
+  if not exist "archive\cmake-3.21.0-windows-x86_64.zip" (
+    curl -L "https://github.com/Kitware/CMake/releases/download/v3.21.0/cmake-3.21.0-windows-x86_64.zip" --output archive\cmake-3.21.0-windows-x86_64.zip
   )
-  tar xf archive\cmake-3.17.3-win64-x64.zip
-  rename cmake-3.17.3-win64-x64 cmake
+  tar xf archive\cmake-3.21.0-windows-x86_64.zip
+  rename cmake-3.21.0-windows-x86_64 cmake
 )
 
 @rem download ninja 1.10.0
@@ -26,7 +26,7 @@ if not exist "cmake" (
 if not exist "ninja" (
   mkdir ninja 2> NUL
   if not exist "archive\ninja-win.zip" (
-    curl -L "https://github.com/ninja-build/ninja/releases/download/v1.10.0/ninja-win.zip" --output archive\ninja-win-1.10.0.zip
+    curl -L "https://github.com/ninja-build/ninja/releases/download/v1.10.2/ninja-win.zip" --output archive\ninja-win-1.10.2.zip
   )
-  tar xf archive\ninja-win-1.10.0.zip -C ninja
+  tar xf archive\ninja-win-1.10.2.zip -C ninja
 )
