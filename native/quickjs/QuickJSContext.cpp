@@ -139,7 +139,7 @@ QuickJSContext::QuickJSContext(JavaVM* javaVM, jobject javaQuack):
     JS_Eval(ctx, str, strlen(str), "<input>", JS_EVAL_TYPE_MODULE);
     // end test
 
-    JS_SetMaxStackSize(runtime, 1024 * 1024 * 4);
+    JS_SetMaxStackSize(runtime, JS_DEFAULT_STACK_SIZE);
 
     auto global = hold(JS_GetGlobalObject(ctx));
     uint8ArrayConstructor = JS_GetPropertyStr(ctx, global, "Uint8Array");
