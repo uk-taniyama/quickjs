@@ -1,24 +1,25 @@
 package com.koushikdutta.quack;
 
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
 public class TestQuack {
     private static boolean useQuickJS = true;
@@ -1146,5 +1147,13 @@ public class TestQuack {
 
         String str4 = quack.evaluate("\"öÖçÇşŞiİğĞüÜıI\".toLocaleLowerCase('tr-TR')", String.class);
         assertEquals("ööççşşiiğğüüıı", str4);
+    }
+
+    @Test
+    public void testTime() {
+        QuackContext quack = QuackContext.create(useQuickJS);
+        Integer hours = quack.evaluate("new Date().getHours()", Integer.class);
+        System.out.println(hours);
+        assertEquals(Calendar.getInstance().get(Calendar.HOUR_OF_DAY), hours.intValue());
     }
 }

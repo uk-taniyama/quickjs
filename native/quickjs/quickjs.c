@@ -40,6 +40,10 @@
 #include <malloc_np.h>
 #endif
 
+#if defined(_WIN32)
+#include <timezoneapi.h>
+#endif
+
 #include "cutils.h"
 #include "list.h"
 #include "quickjs.h"
@@ -42111,8 +42115,19 @@ static JSValue js___date_clock(JSContext *ctx, JSValueConst this_val,
    between UTC time and local time 'd' in minutes */
 static int getTimezoneOffset(int64_t time) {
 #if defined(_WIN32)
-    /* XXX: TODO */
-    return 0;
+  TIME_ZONE_INFORMATION tzi;
+  memset(&tzi, 0, sizeof(tzi));
+  DWORD ctz = GetTimeZoneInformation(&tzi);
+  int r = tzi.Bias; // in minutes
+  switch (ctz) {
+    case TIME_ZONE_ID_STANDARD:
+      r += tzi.StandardBias;
+      break;
+    case TIME_ZONE_ID_DAYLIGHT:
+      r += tzi.DaylightBias;
+      break;
+  }
+  return r;
 #else
     time_t ti;
     struct tm tm;
