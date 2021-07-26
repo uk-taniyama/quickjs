@@ -16,10 +16,15 @@ message(STATUS "JAVA_INCLUDE_PATH2=${JAVA_INCLUDE_PATH2}")
 include_directories(${JAVA_INCLUDE_PATH})
 include_directories(${JAVA_INCLUDE_PATH2})
 
-set(CMAKE_CXX_FLAGS "-fpermissive -Wno-array-bounds -Wno-format-truncation")
-
-if(UNIX)
+if(UNIX OR WIN32)
   add_definitions(-D_GNU_SOURCE)
+  add_definitions(-DCONFIG_BIGNUM)
+  set(CMAKE_CXX_FLAGS "-fpermissive -Wno-array-bounds -Wno-format-truncation")
+  set(CMAKE_C_FLAGS "-Wno-array-bounds -Wno-format-truncation")
+else()
+  add_definitions(-DCONFIG_BIGNUM)
+  set(CMAKE_CXX_FLAGS "-Wextra -Wno-sign-compare -Wno-missing-field-initializers -Wundef -Wuninitialized -Wunused -Wno-unused-parameter -Wwrite-strings -Wchar-subscripts -funsigned-char")
+  set(CMAKE_C_FLAGS "-Wextra -Wno-sign-compare -Wno-missing-field-initializers -Wundef -Wuninitialized -Wunused -Wno-unused-parameter -Wwrite-strings -Wchar-subscripts -funsigned-char")
 endif()
 
 if(WIN32)
