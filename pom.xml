@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.webfolder</groupId>
   <artifactId>quickjs</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
   <name>quickjs</name>
   <description>The quickjs embeddable Javascript engine packaged for Java.</description>
   <licenses>
@@ -84,10 +84,10 @@
           </compilerArgs>
         </configuration>
       </plugin>
-      <!-- plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.0.1</version>
+        <version>3.2.0</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -101,7 +101,7 @@
             </configuration>
           </execution>
         </executions>
-      </plugin -->
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>

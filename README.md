@@ -25,7 +25,7 @@ Supported Platforms
 
 Download
 --------
-[quickjs-1.0.0.jar](https://repo1.maven.org/maven2/io/webfolder/quickjs/1.0.0/quickjs-1.0.0.jar) - 1589 KB
+[quickjs-1.1.0.jar](https://repo1.maven.org/maven2/io/webfolder/quickjs/1.1.0/quickjs-1.1.0.jar) - 1756 KB
 
 How it is tested
 ----------------
@@ -42,7 +42,7 @@ Add the following to your POM's `<dependencies>` tag:
 <dependency>
     <groupId>io.webfolder</groupId>
     <artifactId>quickjs</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 
