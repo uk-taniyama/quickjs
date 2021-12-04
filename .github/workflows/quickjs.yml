@@ -61,7 +61,8 @@ jobs:
         path: src/main/resources/META-INF/libquickjs.dylib
   linux:
     name: linux
-    runs-on: ubuntu-16.04
+    # runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     if: "contains(toJSON(github.event.commits.*.message), '[build linux]')"
     steps:
     - uses: actions/checkout@v2
