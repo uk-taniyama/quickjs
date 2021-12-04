@@ -1,5 +1,4 @@
 name: quickjs
-
 on:
   [push]
 jobs:
